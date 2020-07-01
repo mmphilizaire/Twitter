@@ -1,6 +1,7 @@
 package com.codepath.apps.restclienttemplate;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.codepath.asynchttpclient.RequestParams;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
@@ -54,12 +55,44 @@ public class TwitterClient extends OAuthBaseClient {
 		client.get(apiUrl, params, handler);
 	}
 
-	public void publishTweet(String tweetContent, JsonHttpResponseHandler handler) {
+	public void publishTweet(String tweetContent, long reply_status_id, JsonHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("statuses/update.json");
 		// Can specify query string params directly or through RequestParams.
 		RequestParams params = new RequestParams();
 		params.put("status", tweetContent);
+		Log.d("Mishka", "status id reply: " + reply_status_id);
+		if(reply_status_id != -1){
+			params.put("in_reply_to_status_id", reply_status_id);
+		}
 		client.post(apiUrl, params, "",handler);
+	}
+
+	public void addRetweet(long id, JsonHttpResponseHandler handler) {
+		String apiUrl = getApiUrl("statuses/retweet/"+id+".json");
+		RequestParams params = new RequestParams();
+		params.put("id", id);
+		client.post(apiUrl, params, "", handler);
+	}
+
+	public void removeRetweet(long id, JsonHttpResponseHandler handler) {
+		String apiUrl = getApiUrl("statuses/unretweet/"+id+".json");
+		RequestParams params = new RequestParams();
+		params.put("id", id);
+		client.post(apiUrl, params, "", handler);
+	}
+
+	public void addFavorite(long id, JsonHttpResponseHandler handler) {
+		String apiUrl = getApiUrl("favorites/create.json");
+		RequestParams params = new RequestParams();
+		params.put("id", id);
+		client.post(apiUrl, params, "", handler);
+	}
+
+	public void removeFavorite(long id, JsonHttpResponseHandler handler) {
+		String apiUrl = getApiUrl("favorites/destroy.json");
+		RequestParams params = new RequestParams();
+		params.put("id", id);
+		client.post(apiUrl, params, "", handler);
 	}
 
 	/* 1. Define the endpoint URL with getApiUrl and pass a relative path to the endpoint

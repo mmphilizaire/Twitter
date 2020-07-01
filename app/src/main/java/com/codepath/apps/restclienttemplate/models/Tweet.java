@@ -19,11 +19,16 @@ public class Tweet {
 
     public static final String TAG = "Tweet";
 
+    public long id;
     public String body;
     public String createdAt;
     public User user;
     public String relativeTimeAgo;
     public String media;
+    public int retweets;
+    public int favorites;
+    public boolean retweeted;
+    public boolean favorited;
 
     //empty constructor needed by the parceler library
     public Tweet(){}
@@ -31,6 +36,7 @@ public class Tweet {
     public static Tweet fromJson(JSONObject jsonObject) throws JSONException {
         Log.d(TAG, "body: " + jsonObject.getString("text"));
         Tweet tweet = new Tweet();
+        tweet.id = jsonObject.getLong("id");
         tweet.body = jsonObject.getString("text");
         tweet.createdAt = jsonObject.getString("created_at");
         tweet.user = User.fromJson(jsonObject.getJSONObject("user"));
@@ -41,6 +47,10 @@ public class Tweet {
         else{
             tweet.media = "";
         }
+        tweet.retweets = jsonObject.getInt("retweet_count");
+        tweet.favorites = jsonObject.getInt("favorite_count");
+        tweet.retweeted = jsonObject.getBoolean("retweeted");
+        tweet.favorited = jsonObject.getBoolean("favorited");
         return tweet;
     }
 

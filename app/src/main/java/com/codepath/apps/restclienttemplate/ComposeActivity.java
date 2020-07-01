@@ -27,6 +27,8 @@ public class ComposeActivity extends AppCompatActivity {
     Button btnTweet;
     EditText etCompose;
 
+    long reply_status_id;
+
     TwitterClient client;
 
     @Override
@@ -38,6 +40,15 @@ public class ComposeActivity extends AppCompatActivity {
 
         btnTweet = findViewById(R.id.btnTweet);
         etCompose = findViewById(R.id.etCompose);
+
+        String reply = getIntent().getStringExtra("user_screenName");
+        if(reply != null){
+            etCompose.setText("@" + reply);
+            reply_status_id = getIntent().getLongExtra("status_id", -1);
+        }
+        else{
+            reply_status_id = -1;
+        }
 
         //set a click listener on the button
         btnTweet.setOnClickListener(new View.OnClickListener() {
@@ -54,7 +65,7 @@ public class ComposeActivity extends AppCompatActivity {
                 }
                 Toast.makeText(ComposeActivity.this, tweetContent, Toast.LENGTH_LONG).show();
                 //make an API call to twitter to publish the tweet
-                client.publishTweet(tweetContent, new JsonHttpResponseHandler() {
+                client.publishTweet(tweetContent, reply_status_id, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Headers headers, JSON json) {
                         Log.i(TAG, "onSuccess to publish tweet");

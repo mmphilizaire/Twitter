@@ -1,6 +1,8 @@
 package com.codepath.apps.restclienttemplate;
 
 import android.content.Context;
+import android.content.Intent;
+import android.media.Image;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,8 +15,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.models.Tweet;
+import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
+
+import org.parceler.Parcels;
 
 import java.util.List;
+
+import okhttp3.Headers;
 
 public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder>{
 
@@ -65,29 +72,46 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
     }
 
     //define a viewholder
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+
+        TwitterClient client;
 
         ImageView ivProfileImage;
         TextView tvBody;
         TextView tvScreenName;
         TextView tvTime;
+        TextView tvRetweets;
+        TextView tvFavorites;
         ImageView ivMedia;
+        ImageView ivReply;
+        ImageView ivRetweetSymbol;
+        ImageView ivFavoriteSymbol;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            itemView.setOnClickListener(this);
+
+            client = TwitterApp.getRestClient(context);
 
             ivProfileImage = itemView.findViewById(R.id.ivProfileImage);
             tvBody = itemView.findViewById(R.id.tvBody);
             tvScreenName = itemView.findViewById(R.id.tvScreenName);
             tvTime = itemView.findViewById(R.id.tvTime);
+            tvRetweets = itemView.findViewById(R.id.tvRetweets);
+            tvFavorites = itemView.findViewById(R.id.tvFavorites);
             ivMedia = itemView.findViewById(R.id.ivMedia);
+            ivReply = itemView.findViewById(R.id.ivReply);
+            ivRetweetSymbol = itemView.findViewById(R.id.ivRetweetSymbol);
+            ivFavoriteSymbol = itemView.findViewById(R.id.ivFavoriteSymbol);
 
         }
 
-        public void bind(Tweet tweet){
+        public void bind(final Tweet tweet){
             tvBody.setText(tweet.body);
             tvScreenName.setText(tweet.user.screenName);
             tvTime.setText(tweet.relativeTimeAgo);
+            tvRetweets.setText(""+tweet.retweets);
+            tvFavorites.setText(""+tweet.favorites);
             Glide.with(context).load(tweet.user.profileImageUrl).into(ivProfileImage);
             if(!tweet.media.isEmpty()){
                 ivMedia.setVisibility(View.VISIBLE);
@@ -96,8 +120,101 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             else{
                 ivMedia.setVisibility(View.GONE);
             }
+            ivReply.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View view) {
+                    Intent reply = new Intent(context, ComposeActivity.class);
+                    reply.putExtra("user_screenName", tvScreenName.getText());
+                    reply.putExtra("status_id", tweet.id);
+                    context.startActivity(reply);
+                }
+            });
+            ivRetweetSymbol.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(tweet.retweeted){
+                        client.removeRetweet(tweet.id, new JsonHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                                Log.d("Mishka", "unretweet worked");
+                                tweet.retweeted = false;
+                                tweet.retweets = tweet.retweets-1;
+                                tvRetweets.setText(""+tweet.retweets);
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                                Log.d(TAG, "onFailure to removeRetweet");
+                            }
+                        });
+                    }
+                    else{
+                        client.addRetweet(tweet.id, new JsonHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                                Log.d("Mishka", "retweet worked");
+                                tweet.retweeted = true;
+                                tweet.retweets = tweet.retweets+1;
+                                tvRetweets.setText(""+tweet.retweets);
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                                Log.d(TAG, "onFailure to addRetweet");
+                            }
+                        });
+                    }
+                }
+            });
+            ivFavoriteSymbol.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(tweet.favorited){
+                        client.removeFavorite(tweet.id, new JsonHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                                Log.d("Mishka", "unfavorite worked");
+                                tweet.favorited = false;
+                                tweet.favorites = tweet.favorites-1;
+                                tvFavorites.setText(""+tweet.favorites);
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                                Log.d(TAG, "onFailure to removeFavorite");
+                            }
+                        });
+                    }
+                    else{
+                        client.addFavorite(tweet.id, new JsonHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                                Log.d("Mishka", "favorite worked");
+                                tweet.favorited = true;
+                                tweet.favorites = tweet.favorites+1;
+                                tvFavorites.setText(""+tweet.favorites);
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                                Log.d(TAG, "onFailure to addFavorite");
+                            }
+                        });
+                    }
+                }
+            });
         }
 
+        @Override
+        public void onClick(View view) {
+            int position = getAdapterPosition();
+            if(position != RecyclerView.NO_POSITION){
+                Tweet tweet = tweets.get(position);
+                Intent intent = new Intent(context, TweetDetailActivity.class);
+                intent.putExtra("tweet", Parcels.wrap(tweet));
+                context.startActivity(intent);
+            }
+        }
     }
 
 
