@@ -52,6 +52,7 @@
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
+        android:autoLink="all"
         tools:layout_editor_absoluteX="57dp"
         tools:layout_editor_absoluteY="129dp"
         tools:text="hey, this is my first tweet!" />
