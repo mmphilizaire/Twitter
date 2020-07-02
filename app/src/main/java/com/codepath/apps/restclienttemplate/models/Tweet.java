@@ -11,6 +11,7 @@ import org.parceler.Parcel;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -54,7 +55,7 @@ public class Tweet {
         return tweet;
     }
 
-    public static List<Tweet> fromJsonArray(JSONArray jsonArray) throws JSONException {
+    public static List<Tweet> fromJsonArray(JSONArray jsonArray) throws JSONException{
         List<Tweet> tweets = new ArrayList<Tweet>();
         for(int i = 0; i < jsonArray.length(); i++){
             tweets.add(fromJson(jsonArray.getJSONObject(i)));
