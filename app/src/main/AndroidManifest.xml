@@ -13,7 +13,8 @@
         android:icon="@drawable/ic_launcher_twitter_round"
         android:label=""
         android:theme="@style/AppTheme">
-        <activity android:name=".TweetDetailActivity"></activity>
+        <activity android:name=".ReplyActivity"></activity>
+        <activity android:name=".TweetDetailActivity" />
         <activity android:name=".ComposeActivity" />
         <activity android:name=".TimelineActivity" />
         <activity

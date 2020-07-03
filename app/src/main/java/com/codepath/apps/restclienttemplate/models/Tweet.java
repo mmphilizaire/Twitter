@@ -11,47 +11,43 @@ import org.parceler.Parcel;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 @Parcel
 public class Tweet {
 
-    public static final String TAG = "Tweet";
-
-    public long id;
-    public String body;
-    public String createdAt;
-    public User user;
-    public String relativeTimeAgo;
-    public String media;
-    public int retweets;
-    public int favorites;
-    public boolean retweeted;
-    public boolean favorited;
+    public long mId;
+    public String mBody;
+    public String mCreatedAt;
+    public User mUser;
+    public String mRelativeTimeAgo;
+    public String mMedia;
+    public int mRetweets;
+    public int mFavorites;
+    public boolean mRetweeted;
+    public boolean mFavorited;
 
     //empty constructor needed by the parceler library
     public Tweet(){}
 
     public static Tweet fromJson(JSONObject jsonObject) throws JSONException {
-        Log.d(TAG, "body: " + jsonObject.getString("text"));
         Tweet tweet = new Tweet();
-        tweet.id = jsonObject.getLong("id");
-        tweet.body = jsonObject.getString("text");
-        tweet.createdAt = jsonObject.getString("created_at");
-        tweet.user = User.fromJson(jsonObject.getJSONObject("user"));
-        tweet.relativeTimeAgo = getRelativeTimeAgo(tweet.createdAt);
+        tweet.mId = jsonObject.getLong("id");
+        tweet.mBody = jsonObject.getString("text");
+        tweet.mCreatedAt = jsonObject.getString("created_at");
+        tweet.mUser = User.fromJson(jsonObject.getJSONObject("user"));
+        tweet.mRelativeTimeAgo = getRelativeTimeAgo(tweet.mCreatedAt);
         if(jsonObject.getJSONObject("entities").has("media")){
-            tweet.media = jsonObject.getJSONObject("entities").getJSONArray("media").getJSONObject(0).getString("media_url_https");
+            tweet.mMedia = jsonObject.getJSONObject("entities").getJSONArray("media").getJSONObject(0).getString("media_url_https");
         }
         else{
-            tweet.media = "";
+            tweet.mMedia = "";
         }
-        tweet.retweets = jsonObject.getInt("retweet_count");
-        tweet.favorites = jsonObject.getInt("favorite_count");
-        tweet.retweeted = jsonObject.getBoolean("retweeted");
-        tweet.favorited = jsonObject.getBoolean("favorited");
+        tweet.mRetweets = jsonObject.getInt("retweet_count");
+        tweet.mFavorites = jsonObject.getInt("favorite_count");
+        tweet.mRetweeted = jsonObject.getBoolean("retweeted");
+        tweet.mFavorited = jsonObject.getBoolean("favorited");
         return tweet;
     }
 

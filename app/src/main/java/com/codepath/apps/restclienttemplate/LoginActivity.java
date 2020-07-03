@@ -3,7 +3,6 @@ package com.codepath.apps.restclienttemplate;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 
@@ -13,7 +12,7 @@ import com.codepath.oauth.OAuthLoginActionBarActivity;
 
 public class LoginActivity extends OAuthLoginActionBarActivity<TwitterClient> {
 
-	SampleModelDao sampleModelDao;
+	SampleModelDao mSampleModelDao;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -23,12 +22,12 @@ public class LoginActivity extends OAuthLoginActionBarActivity<TwitterClient> {
 		final SampleModel sampleModel = new SampleModel();
 		sampleModel.setName("CodePath");
 
-		sampleModelDao = ((TwitterApp) getApplicationContext()).getMyDatabase().sampleModelDao();
+		mSampleModelDao = ((TwitterApp) getApplicationContext()).getMyDatabase().sampleModelDao();
 
 		AsyncTask.execute(new Runnable() {
 			@Override
 			public void run() {
-				sampleModelDao.insertModel(sampleModel);
+				mSampleModelDao.insertModel(sampleModel);
 			}
 		});
 	}
